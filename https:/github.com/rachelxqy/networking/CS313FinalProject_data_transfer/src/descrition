@@ -1,0 +1,96 @@
+
+CS 313 Networking and Telecommunications Project (Due by any time between now and 4:00PM 4/28/2014)
+Simulation of Simplex Stop-and-Wait with PAR and NAK
+Objective
+To understand error control in data communication for noisy simplex channel in the data link layer by simulating the simplex stop-and-wait protocol with PAR and NAK.
+
+Description
+This project implements the PAR error control protocol studied in the class.  The two major programs are the sender and the receiver (feel free to modify LinkSender and LinkReceiver).  The sender transmits a file through a noisy channel.  Errors are generated randomly to alter bits in a CRC-checksummed frame.  When the receiver receives a frame, it calculates the CRC checksum.  If there is no error, a positive acknowledgment will be sent to the sender.  Otherwise, a negative acknowledgment will be sent back to the sender and the frame has to be retransmitted.  The communication continues until the file is transmitted completely. Note that we unrealistically assume that no data will be lost and no error occurs on ACK for the sake of proof-of-concept and to simplify the implementation.
+
+Frame Format
+Two types of frames are used in our protocol.  Their formats are described as follows:
+
+1. Date frame (fixed size = 19 bytes), sent from sender to receiver
+ [ SEQ | LEN | PAYLOAD | CHECKSUM ]
+
+ SEQ: sequence number; size = 1 byte; not really used, reserved for future use
+ LEN: actual length of data in bytes; size = 1 bytes; value is up to 16
+           LEN = 0 means "empty data" which is used to signal the termination of data trasfer  
+ PAYLOAD: data of the frame size = 16 bytes
+ CHECKSUM: generated using CRC-8; size = 1byte
+
+2. Acknowledgment frame, sent from receiver to sender
+ [ ACK ]
+
+ ACK: size = 1 byte; value = 1 for positive acknowledgment, and 0 for negative acknowledgment
+
+Sender Procedure
+1. Reads a "packet" of 16 bytes (or whatever left) form the input file.
+2. Puts the packet into the PAYLOAD field and completes the header information of the frame.
+3. Calculates CRC-8 checksum for the frame and places it in the CHECKSUM field of the frame.
+4. Uses the error function to generate error or errors intentionally and then transmits the possibly damaged frame.
+5. Receives the acknowledgment.
+6. If positive then
+        go to step 1
+    else
+        go to step 4 (if the frame is not "buffered" you might have to go to step 2)
+The procedure terminates when the file is "transferred" completely.
+The sender then sends an "empty data" to signal the end.
+Close the input file.
+
+Receiver Procedure
+1. Receives the frame and calculates the checksum.
+2. If no error is detected then
+        writes the "packet" (i.e., frame's PAYLOAD field) to the output file
+        sends a positive acknowledgment to sender
+    else
+        sends a negative acknowledgment to sender
+The procedure terminates when "empty data" is received.
+Close the output file.
+(Don't forget to compare the two files after the program terminates to verify the correctness of your programs.)
+
+Requirements
+1. You are required to use the Link class provided by the instructor for the data communication.
+2. Use the CRC function provided by the instructor or implemented by yourself.
+3. You are required to implement the protocol exactly as described, including the frame format and procedure.
+4. Include a trace option.  If trace is on, the sender will output the following message:
+        Frame x transmitted, status
+    and the receiver will output the following message:
+        Frame x received, status
+    where x is the sequence number and status is either "ok" or "error".
+5. Error function uses a random number generator to determine whether to damage a frame.
+    If a frame is to be damaged, the probability to have 1 error is 0.8 and 2 errors is 0.2.
+    Every bit in a damaged frame is equally likely to be altered.
+6. Input from user:
+    Sender: name of input file, probability that a frame will be damaged (i.e. error rate), trace on/off
+    Receiver: name of output file, trace on/off  
+7. Test your programs on these input files: mission0.txt, mission1.txt, and mission2.txt, with error rates 0, 10%, 50%, and 90% for each test case. You are encouraged to include more test cases created by yourslef.
+8. Output to screen after transmission completed by sender
+    Total number of "packets" read
+    Total number of frames transmitted
+    Theoretical total number of frames transmitted (= Total number of "packets" read / (1 - error rate))
+    Total number of frames damaged
+    Maximum number of retransmission for any single frame
+9. Both content and size of the received file must be identical to those of the file sent.
+10. This project is to be done individually.  Do not copy any other student's work or copy from any other source.  However, after you are done, you are encouraged to test your programs with other students.
+
+Submission
+1. Scheduel with the instructor to give a demo as soon as you are done.
+2. Submit to D2L your code, report, instruction, the executable files, and results of test runs.
+3. The report should include the analysis on the actual and theoretical total numbers of frames transmistted, what you learned from this project, the obstacles encountered during working on this project and how they are tackled, comments, suggestions, and known bugs.
+4. The instructor may contact you regarding testing and grading your project.
+
+Grading
+Correctness, robustness, documentation, and report.  When grading, I might randomly select a correct receiver program done by another student to test your sender program.
+Note that a successful file transfer means both content and size of the two files should be identical.
+
+Suggested Milestones
+Week 1: Make sure you understand the project and its requirements and can run the programs provided to you without problems. Figure out how to read from a file to byte arrays and write byte arrays to a file.
+You are advised to write a simple program that can repeatedly read 16 bytes from a file into a byte array and then write the byte array to an output file until the entire file has been "copied". If you cannot make it work, there is no point to proceed to the next step.
+Week 2: Implement the protocol and test it using strings or a simple file with out errors, and then with errors introduced.
+Week 3: Test on files. Add other requirements.
+Week 4: Wrap up. Write report.
+Week 5: Give a demonstration to the instructor.
+
+START AS EARLY AS POSSIBLE!!
+FEEL FREE TO POST QUESTIONS TO D2L DISCUSSIONS! 

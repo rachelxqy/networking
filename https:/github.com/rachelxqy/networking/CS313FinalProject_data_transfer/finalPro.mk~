@@ -1,0 +1,23 @@
+CS313SampleProject = $(shell pwd)
+
+#JAVAC = /usr/local/biotools/java/jdk1.7.0_03/bin/javac
+#JAVA = /usr/local/biotools/java/jdk1.7.0_03/bin/java
+JAVAC = javac
+JAVA = java
+
+#JAVAC = ~/java/jdk1.7.0_11/bin/javac
+#JAVA = ~/java/jdk1.7.0_11/bin/java
+JAVA_FLAGS = -classpath "$(CS313SampleProject)/class:$(CS313SampleProject)/bin:$(CS313SampleProject)/src:cjcook-examples-0.19-jar-with-dependencies.jar"
+
+JAVAC_FLAGS = \
+$(JAVA_FLAGS) \
+-sourcepath "$(CS313SampleProject)/src:$(CS313SampleProject)/autosrc" \
+-g:lines,vars,source \
+-d $(CS313SampleProject)/class \
+##-J-Xmx30g -source 1.7
+
+### note: the model file name is changed to MedTagger_model_third
+all: class
+	$(JAVAC) $(JAVAC_FLAGS) `find src -name '*.java'`
+	$(JAVA) -Xmx1g -Xms1g $(JAVA_FLAGS) sampleProject/LinkSender 
+	$(JAVA) -Xmx1g -Xms1g $(JAVA_FLAGS) sampleProject/LinkReceiver
